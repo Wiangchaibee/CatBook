@@ -28,6 +28,10 @@
     <string name="add_data_title_vaccine">Add this Vaccine?</string>
     <string name="add_data_message_vaccine">Are you sure to add this Vaccine?</string>
 
+    <string name="add_data_title_veterinarian">Add this Veterinarian?</string>
+    <string name="add_data_message_veterinarian">Are you sure to add this Veterinarian?</string>
+
+
     <string name="Name">Name :</string>
     <string name="Gender">Gender :</string>
     <string name="Breed">Breed :</string>
@@ -56,4 +60,18 @@
     <string name="alert_title">Delete this Cat?</string>
     <string name="alert_message">Are you sure to delete this Cat?</string>
     <string name="title_activity_cat">Cat</string>
+
+    <string name="title_activity_veterinarian">Veterinarian</string>
+    <string name="title_activity_veterinarian_detail">VeterinarianDetail</string>
+
+    <string name="NameV">Name :</string>
+    <string name="Last_Name">Last Name :</string>
+    <string name="Address">Address :</string>
+    <string name="Phone">Phone Number :</string>
+    <string name="Email">Email :</string>
+
+    <string name="alert_title_veterinarian">Delete this Veterinarian?</string>
+    <string name="alert_message_veterinarian">Are you sure to delete this Veterinarian?</string>
+    <string name="title_activity_add_vaccine">AddVaccine</string>
+    <string name="title_activity_add_type">AddType</string>
 </resources>
