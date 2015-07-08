@@ -22,6 +22,8 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.MediaStore.Images.Media;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +49,7 @@ import java.util.Date;
 
 
 public class AddCat extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,InputFilter {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -79,7 +82,40 @@ public class AddCat extends ActionBarActivity
     ImageView imageView;
     private String selectedImagePath;
 
+    private float min, max;
 
+    public AddCat(float min, float max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    public AddCat(String min, String max) {
+        this.min = Float.parseFloat(min);
+        this.max = Float.parseFloat(max);
+    }
+
+    public AddCat() {
+
+    }
+
+    @Override
+    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+        try {
+            // Remove the string out of destination that is to be replaced
+            String newVal = dest.toString().substring(0, dstart) + dest.toString().substring(dend, dest.toString().length());
+            // Add the new string in
+            newVal = newVal.substring(0, dstart) + source.toString() + newVal.substring(dstart, newVal.length());
+            float input = Float.parseFloat(newVal);
+            if (isInRange(min, max, input))
+                return null;
+        } catch (NumberFormatException nfe) {
+        }
+        return "";
+    }
+
+    private boolean isInRange(float a, float b, float c) {
+        return b > a ? c >= a && c <= b : c >= b && c <= a;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +126,17 @@ public class AddCat extends ActionBarActivity
         edtBreed = (EditText) findViewById(R.id.ADET3);
         edtBirth = (EditText) findViewById(R.id.ADET4);
         edtWeight = (EditText) findViewById(R.id.ADET5);
+        edtWeight.setFilters(new InputFilter[]{new AddCat("0", "9")});
 
         Save = (Button) findViewById(R.id.ADBT1);
 
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        imageView = (ImageView)findViewById(R.id.ADIM);
-        final ImageView imageIntent = (ImageView)findViewById(R.id.ADIM);
+
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+        imageView = (ImageView) findViewById(R.id.ADIM);
+        final ImageView imageIntent = (ImageView) findViewById(R.id.ADIM);
         imageIntent.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -155,58 +195,99 @@ public class AddCat extends ActionBarActivity
         /////////////////////////////////////////////////////////////////////////////////////
 
 
-
         Save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AlertDialog.Builder builder =
-                        new AlertDialog.Builder(AddCat.this);
-                builder.setTitle(getString(R.string.add_data_title));
-                builder.setMessage(getString(R.string.add_data_message));
 
-                builder.setPositiveButton(getString(android.R.string.ok),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                myCatData cat = new myCatData();
-                                cat.setName(edtName.getText().toString());
-                                cat.setGender(edtGender.getText().toString());
-                                cat.setBreed(edtBreed.getText().toString());
-                                cat.setBirth(edtBirth.getText().toString());
-                                cat.setWeight(edtWeight.getText().toString());
-                                cat.setImageByteArray(selectedImagePath.getBytes());
+                                if (ItSave()) {
 
 
-                                if (ID == -1) {
-                                    connect.addCat(cat);
-                                    finish();
-
-                                } else {
-                                    cat.setId(ID);
-                                    connect.updateCatData(cat);
-                                    finish();
-                                    Intent Update = new Intent(AddCat.this, CatList.class);
-                                    startActivity(Update);
                                 }
-
-
-                            }
-                        });
-
-                builder.setNegativeButton(getString(android.R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-
-                        });
-
-                builder.show();
             }
-        });
 
+        });
     }
+
+    private boolean ItSave() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(AddCat.this);
+        builder.setTitle(getString(R.string.add_data_title));
+        builder.setMessage(getString(R.string.add_data_message));
+
+        myCatData cat = new myCatData();
+        cat.setName(edtName.getText().toString());
+        cat.setGender(edtGender.getText().toString());
+        cat.setBreed(edtBreed.getText().toString());
+        cat.setBirth(edtBirth.getText().toString());
+        cat.setWeight(edtWeight.getText().toString());
+
+        if (edtName.getText().length() == 0) {
+            builder.setMessage("Pleas enter name");
+            builder.show();
+            edtName.requestFocus();
+            return false;
+        }
+
+        if (edtGender.getText().length() == 0 ) {
+            builder.setMessage("Pleas select gender");
+            builder.show();
+            edtGender.requestFocus();
+            return false;
+        }
+
+        if (edtBreed.getText().length() == 0 && edtBreed == null && edtBreed.equals("")) {
+            builder.setMessage("Pleas enter breed");
+            builder.show();
+            edtBreed.requestFocus();
+            return false;
+        }
+
+        if (edtWeight == null && edtWeight.equals("")) {
+            builder.setMessage("Pleas enter wight");
+            builder.show();
+            edtWeight.requestFocus();
+            return false;
+        }
+
+        builder.setPositiveButton(getString(android.R.string.ok),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        myCatData cat = new myCatData();
+
+
+
+                        if (ID == -1) {
+
+                            connect.addCat(cat);
+                            finish();
+
+
+                        } else {
+                            cat.setId(ID);
+                            connect.updateCatData(cat);
+                            finish();
+                            Intent Update = new Intent(AddCat.this, CatList.class);
+                            startActivity(Update);
+                        }
+
+
+                    }
+                });
+
+        builder.setNegativeButton(getString(android.R.string.cancel),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+
+                });
+
+        builder.show();
+return true;
+    }
+
 
     public void onActivityResult(int requestCode, int resultCode
             , Intent data) {
@@ -218,6 +299,9 @@ public class AddCat extends ActionBarActivity
             imageView.setImageURI(uri);
         }
     }
+
+
+
 
 
     public String getPath(Uri uri) {

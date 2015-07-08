@@ -29,30 +29,24 @@ public class ConnectDB extends SQLiteOpenHelper {
 
     public ConnectDB(Context context) {
         super(context, myCatData.DATABASE_NAME, null, myCatData.DATABASE_VERSION);
+
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-//////////////////////////////////////////Veterinarian//////////////////////////////////////////////
-        String CREATE_VETERINARIAN_TABLE = String.format("CREATE TABLE %s" +
-                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(20), %s VARCHAR(20) , %s VARCHAR(45), %s VARCHAR(15) , %s VARCHAR(45))",
-                veterinarianData.TABLE,
-                veterinarianData.Column.ID,
-                veterinarianData.Column.Name,
-                veterinarianData.Column.Last_name,
-                veterinarianData.Column.Address,
-                veterinarianData.Column.Phone_Number,
-                veterinarianData.Column.Email
-        );
-        Log.i(TAG, CREATE_VETERINARIAN_TABLE);
-        // create cat data table
-        db.execSQL(CREATE_VETERINARIAN_TABLE);
 
-/////////////////////////////////////////cat////////////////////////////////////////////////////////
         String CREATE_CAT_DATA_TABLE = String.format("CREATE TABLE %s " +
-                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(15), %s CHAR, %s VARCHAR(45), %s DATE, %s INTEGER ,%s TEXT ," +
-                        " FOREIGN KEY (%s) REFERENCES %s)",
+                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(15), %s CHAR, %s VARCHAR(45), %s DATE, %s INTEGER ,%s TEXT )",
                 myCatData.TABLE,
                 myCatData.Column.ID,
                 myCatData.Column.NAME,
@@ -60,9 +54,7 @@ public class ConnectDB extends SQLiteOpenHelper {
                 myCatData.Column.BREED,
                 myCatData.Column.BIRTH,
                 myCatData.Column.WEIGHT,
-                myCatData.Column.PICTURE,
-                veterinarianData.Column.ID,
-                myCatData.Column.REFERENCES_Veterinarian_ID
+                myCatData.Column.PICTURE
 
         );
 
@@ -71,6 +63,27 @@ public class ConnectDB extends SQLiteOpenHelper {
         // create cat data table
         db.execSQL(CREATE_CAT_DATA_TABLE);
 //////////////////////////////////////////////vaccine///////////////////////////////////////////////
+        //////////////////////////////////////////Veterinarian//////////////////////////////////////////////
+        String CREATE_VETERINARIAN_TABLE = String.format("CREATE TABLE %s" +
+                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(20), %s VARCHAR(20) , %s VARCHAR(45), %s VARCHAR(15) , %s VARCHAR(45)," +
+                        " FOREIGN KEY (%s) REFERENCES %s)",
+                veterinarianData.TABLE,
+                veterinarianData.Column.ID,
+                veterinarianData.Column.Name,
+                veterinarianData.Column.Last_name,
+                veterinarianData.Column.Address,
+                veterinarianData.Column.Phone_Number,
+                veterinarianData.Column.Email,
+                myCatData.Column.ID,
+                myCatData.Column.REFERENCES_MYCATDATA_ID
+
+
+        );
+        Log.i(TAG, CREATE_VETERINARIAN_TABLE);
+        // create cat data table
+        db.execSQL(CREATE_VETERINARIAN_TABLE);
+
+/////////////////////////////////////////cat////////////////////////////////////////////////////////
         String CREATE_VACCINE_TABLE = String.format("CREATE TABLE %s " +
                         "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(15), %s VARCHAR(45), %s DATE, %s VARCHAR(45))",
                 vaccineData.TABLE,
@@ -100,6 +113,41 @@ public class ConnectDB extends SQLiteOpenHelper {
         // create cat data table
         db.execSQL(CREATE_EXPENSES_TABLE);
 
+
+////////////////////////////////////addVaccine_Name/////////////////////////////////////////////////
+        String CREATE_ADD_VACCINE_TABLE = String.format("CREATE TABLE %s " +
+                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(45))",
+                addVaccineData.TABLE,
+                addVaccineData.Column.ID,
+                addVaccineData.Column.NAME);
+
+        Log.i(TAG, CREATE_ADD_VACCINE_TABLE);
+
+        // create cat data table
+        db.execSQL(CREATE_ADD_VACCINE_TABLE);
+        String sql = "INSERT or replace INTO " + addVaccineData.TABLE + "( " + addVaccineData.Column.NAME +
+                ") VALUES ('วัคซีนพิษสุนัขบ้า'),('วัคซีนไข้หัด'),('วัคซีนลิวคีเมีย'),('FIP (เยื่อบุช่องท้องอักเสบ)'),('FIV (เอดส์แมว)'),('อื่นๆ')";
+
+        db.execSQL(sql);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+        String CREATE_ADD_EXPENSE_TYPE_TABLE = String.format("CREATE TABLE %s " +
+                        "(%s INTEGER PRIMARY KEY  AUTOINCREMENT, %s VARCHAR(45))",
+                addExpenseType.TABLE,
+                addExpenseType.Column.ID,
+                addExpenseType.Column.NAME);
+
+        Log.i(TAG, CREATE_ADD_EXPENSE_TYPE_TABLE);
+
+        // create cat data table
+        db.execSQL(CREATE_ADD_EXPENSE_TYPE_TABLE);
+
+        String sql2 ="INSERT or replace INTO " + addExpenseType.TABLE + "( " + addExpenseType.Column.NAME +
+                ") VALUES ('อาหาร'),('รักษาพยาบาล'),('อุปกรณ์'),('อื่นๆ')";
+
+        db.execSQL(sql2);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
     }
 
@@ -495,6 +543,94 @@ public class ConnectDB extends SQLiteOpenHelper {
 
         sqLiteDatabase.close();
     }
+
+///////////////////////////////////////addVaccine_Name//////////////////////////////////////////////
+
+    public List<String> getAllVaccine() {
+
+        List<String> vaccine = new ArrayList<String>();
+
+        sqLiteDatabase = this.getWritableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query
+                (addVaccineData.TABLE, null, null, null, null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+
+        while (!cursor.isAfterLast()) {
+
+            vaccine.add(
+                    cursor.getString(1)
+            );
+
+            cursor.moveToNext();
+        }
+
+        sqLiteDatabase.close();
+
+        return vaccine;
+    }
+
+        public void addVaccineData(addVaccineData vaccine) {
+        sqLiteDatabase = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(addVaccineData.Column.NAME, vaccine.getName());
+
+
+        sqLiteDatabase.insert(addVaccineData.TABLE, null, values);
+
+        sqLiteDatabase.close();
+    }
+
+
+////////////////////////////////////////addType/////////////////////////////////////////////////////
+
+    public List<String> getAllType() {
+
+        List<String> type = new ArrayList<String>();
+
+        sqLiteDatabase = this.getWritableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query
+                (addExpenseType.TABLE, null, null, null, null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+
+        while (!cursor.isAfterLast()) {
+
+            type.add(
+                    cursor.getString(1)
+            );
+
+            cursor.moveToNext();
+        }
+
+        sqLiteDatabase.close();
+
+        return type;
+    }
+
+    public void addType(addExpenseType type) {
+        sqLiteDatabase = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(addExpenseType.Column.NAME, type.getName());
+
+
+        sqLiteDatabase.insert(addExpenseType.TABLE, null, values);
+
+        sqLiteDatabase.close();
+    }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 }

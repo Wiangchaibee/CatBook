@@ -210,12 +210,17 @@ public class Vaccine extends ActionBarActivity
 
     private void loadSpinnerDataName() {
 
-        String[] Name = {"วัคซีนพิษสุนัขบ้า", "วัคซีนไข้หัด", "วัคซีนลิวคีเมีย", "FIP (เยื่อบุช่องท้องอักเสบ)", "FIV (เอดส์แมว)", "อื่นๆ"};
+       // String[] Name = {"วัคซีนพิษสุนัขบ้า", "วัคซีนไข้หัด", "วัคซีนลิวคีเมีย", "FIP (เยื่อบุช่องท้องอักเสบ)", "FIV (เอดส์แมว)", "อื่นๆ"};
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Name);
+        List<String> labels = connect.getAllVaccine();
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        // attaching data adapter to spinner
         edtName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View view,
@@ -233,6 +238,9 @@ public class Vaccine extends ActionBarActivity
                     case 5:
                       final Intent  intent = new Intent(Vaccine.this, AddVaccine.class);
                         startActivity(intent);
+                        overridePendingTransition(android.R.anim.fade_in,
+                                android.R.anim.fade_out);
+                        finish();
                         break;
 
                 }

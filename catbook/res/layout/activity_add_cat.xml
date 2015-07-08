@@ -106,7 +106,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/ADET5"
                 android:layout_alignBottom="@+id/ADTV5"
-                android:layout_toEndOf="@+id/ADTV2" />
+                android:layout_toEndOf="@+id/ADTV2"
+                android:inputType="numberDecimal"/>
 
             <ImageView
                 android:layout_width="wrap_content"

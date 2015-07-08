@@ -30,8 +30,7 @@ public class myCatData {
         public static final String BIRTH = "Birth";
         public static final String WEIGHT = "Weight";
         public static final String PICTURE = "Picture";
-        public static final String Veterinarian_ID = "Veterinarian_ID";
-        public static final String REFERENCES_Veterinarian_ID = "Veterinarian(_ID)";
+        public static final String REFERENCES_MYCATDATA_ID = "Cat_Data(_ID)";
     }
 
 

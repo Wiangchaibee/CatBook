@@ -188,10 +188,14 @@ public class AddExpenses extends ActionBarActivity
     }
 
     private void loadSpinnerExpensesType() {
-        String[] expense = {"อาหาร","รักษาพยาบาล","อุปกรณ์","อื่นๆ"};
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, expense);
+      //  String[] expense = {"อาหาร","รักษาพยาบาล","อุปกรณ์","อื่นๆ"};
+        List<String> labels = connect.getAllType();
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
+
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         edtType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -204,11 +208,12 @@ public class AddExpenses extends ActionBarActivity
                         break;
                     case 2:
                         break;
-                    case 3:
-                        break;
-                    case 4:
+                     case 3:
                         final Intent  intent = new Intent(AddExpenses.this, AddType.class);
                         startActivity(intent);
+                         finish();
+                        overridePendingTransition(android.R.anim.fade_in,
+                                android.R.anim.fade_out);
                         break;
 
                 }

@@ -1,6 +1,8 @@
 package sarayutwiangchai.catbook;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -37,6 +39,8 @@ public class AddType extends ActionBarActivity
     private CharSequence mTitle;
     private EditText Names;
     private Button OK;
+    private ConnectDB connect;
+    private int ID = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +56,57 @@ public class AddType extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        connect = new ConnectDB(this);
+
         Names = (EditText) findViewById(R.id.ED);
         OK = (Button) findViewById(R.id.button);
 
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent name = new Intent(AddType.this,AddExpenses.class);
-                String vaccine = null;
-                name.putExtra("Names",vaccine);
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(AddType.this);
+                builder.setTitle(getString(R.string.add_data_title_vaccine));
+                builder.setMessage(getString(R.string.add_data_message_vaccine));
+
+                builder.setPositiveButton(getString(android.R.string.ok),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                addExpenseType type = new addExpenseType();
+                                type.setName(Names.getText().toString());
+
+
+                                if (ID == -1) {
+                                    connect.addType(type);
+                                    final Intent  intent = new Intent(AddType.this, AddExpenses.class);
+                                    startActivity(intent);
+                                    overridePendingTransition(android.R.anim.fade_in,
+                                            android.R.anim.fade_out);
+                                    finish();
+
+                                } else {
+                                    //vaccine.setId(ID);
+                                    //connect.updateCatData(cat);
+                                    //finish();
+                                    //Intent Update = new Intent(AddCat.this, CatList.class);
+                                    // startActivity(Update);
+                                }
+
+
+                            }
+                        });
+
+                builder.setNegativeButton(getString(android.R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+
+                        });
+
+                builder.show();
             }
         });
     }
